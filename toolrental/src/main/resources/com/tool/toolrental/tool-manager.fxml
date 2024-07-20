@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TabPane layoutY="1.0" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
@@ -14,8 +13,13 @@
                      <children>
                         <ComboBox layoutX="14.0" layoutY="14.0" prefWidth="150.0" promptText="Tool Type" />
                         <ComboBox layoutX="175.0" layoutY="14.0" prefWidth="150.0" promptText="Tool Status" />
-                        <ListView fx:id="ToolList" layoutX="14.0" layoutY="54.0" prefHeight="292.0" prefWidth="386.0" />
                         <ScrollBar layoutX="400.0" layoutY="54.0" orientation="VERTICAL" prefHeight="292.0" prefWidth="14.0" />
+                        <TableView layoutX="14.0" layoutY="54.0" prefHeight="292.0" prefWidth="386.0">
+                          <columns>
+                            <TableColumn prefWidth="75.0" text="C1" />
+                            <TableColumn prefWidth="75.0" text="C2" />
+                          </columns>
+                        </TableView>
                      </children>
                   </AnchorPane>
             </content>

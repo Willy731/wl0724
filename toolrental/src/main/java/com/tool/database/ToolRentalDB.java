@@ -23,6 +23,26 @@ public class ToolRentalDB {
             ToolsDB toolsDB = new ToolsDB();
             toolsDB.Initialize(connection);
 
+            // Create the Renters table
+            RenterDB rentersDB = new RenterDB();
+            rentersDB.Initialize(connection);
+
+            // Create the Clerks table
+            ClerkDB clerksDB = new ClerkDB();
+            clerksDB.Initialize(connection);
+
+            // Create the RentTracker table
+            RentTrackerDB rentTrackerDB = new RentTrackerDB();
+            rentTrackerDB.Initialize(connection);
+
+            // Create the Charge table
+            ChargeDB chargeDB = new ChargeDB();
+            chargeDB.Initialize(connection);
+
+            // Create the Charge table
+            HolidayCalendarDB holidayCalendarDB = new HolidayCalendarDB();
+            holidayCalendarDB.Initialize(connection);
+
             log.info("Database initialized successfully.");
             statement.close();
         } catch (SQLException e) {

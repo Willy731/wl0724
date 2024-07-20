@@ -7,22 +7,18 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.h2.tools.Server;
 
-import java.sql.*;
-
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ResourceBundle;
-
-public class HelloApplication extends Application {
-    private static final Logger log = LoggerFactory.getLogger(HelloApplication.class);
+public class ToolRentalApplication extends Application {
+    private static final Logger log = LoggerFactory.getLogger(ToolRentalApplication.class);
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
+        FXMLLoader fxmlLoader = new FXMLLoader(ToolRentalApplication.class.getResource("tool-rental-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());//, 320, 240);
+        stage.setTitle("Tool Rental Application");
         stage.setScene(scene);
         stage.show();
     }

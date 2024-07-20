@@ -1,6 +1,7 @@
 package com.tool.database;
 
 import com.tool.database.constants.ToolStatus;
+import com.tool.database.constants.ToolType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,9 @@ import static com.tool.database.constants.DBConstants.jdbcUrl;
 
 public class ToolsDB {
     private static final Logger log = LoggerFactory.getLogger(ToolsDB.class);
+
+    String insertSQL = "INSERT INTO tools (toolCode, toolType, brand, rentalStatus, conditionStatus, rentalTrackingCode) VALUES (?, ?, ?, ?, ?, ?)";
+
     public void Initialize(){
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "sa", "")) {
             Initialize(connection);
@@ -41,21 +45,21 @@ public class ToolsDB {
         }
     }
     private void PrefillData(Connection connection){
-        String insertSQL = "INSERT INTO tools (toolCode, toolType, brand, rentalStatus, conditionStatus, rentalTrackingCode) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             // Example data to insert
             List<Tool> toolsList = new ArrayList<>();
-            toolsList.add(new Tool("CHNS", "Chainsaw", "Stihl", ToolStatus.AVAILABLE.toString() , "NEW", null));
-            toolsList.add(new Tool("LADW", "Ladder", "Werner", ToolStatus.RENTED.toString(), "USED", null      ));
-            toolsList.add(new Tool("JAKD", "Jackhammer", "DeWalt", ToolStatus.AVAILABLE.toString(), "NEW", null));
-            toolsList.add(new Tool("JAKR", "Jackhammer", "Ridgid", ToolStatus.AVAILABLE.toString(), "NEW", null));
+            toolsList.add(new Tool("CHNS", ToolType.CHAINSAW, "Stihl", ToolStatus.AVAILABLE , "NEW", null));
+            toolsList.add(new Tool("LADW", ToolType.LADDER, "Werner", ToolStatus.AVAILABLE, "USED", null      ));
+            toolsList.add(new Tool("JAKD", ToolType.JACKHAMMER, "DeWalt", ToolStatus.AVAILABLE, "NEW", null));
+            toolsList.add(new Tool("JAKR", ToolType.JACKHAMMER, "Ridgid", ToolStatus.AVAILABLE, "NEW", null));
+            toolsList.add(new Tool("LADS", ToolType.LADDER, "Stihl", ToolStatus.RENTED, "USED", null      ));
 
             // Insert each entry using the prepared statement
             for (Tool tool : toolsList) {
                 preparedStatement.setString(1, (String) tool.getToolCode());
-                preparedStatement.setString(2, (String) tool.getToolType());
+                preparedStatement.setString(2, (String) tool.getToolType().toString());
                 preparedStatement.setString(3, (String) tool.getBrand());
                 preparedStatement.setString(4, (String) tool.getRentalStatus().toString());
                 preparedStatement.setString(5, (String) tool.getConditionStatus());
@@ -76,9 +80,9 @@ public class ToolsDB {
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "sa", "")) {
             // Query the tools table
             Statement statement = connection.createStatement();
-            String querySQL = "SELECT * FROM tools";
+            String querySQL = "SELECT * FROM tools WHERE RENTALSTATUS = 'AVAILABLE'";
             ResultSet resultSet = statement.executeQuery(querySQL);
-            log.error("Got the resultSet");
+
             // Map ResultSet to List of Tool objects
             ResultSetMapper<Tool> mapper = new ResultSetMapper<>();
             List<Tool> tools = mapper.map(resultSet, Tool.class);
@@ -92,5 +96,27 @@ public class ToolsDB {
             log.error("Issue with converting Tools list");
         }
         return null;
+    }
+
+    public boolean insertNewTool(String toolCode, ToolType toolType, String brand, ToolStatus rentalStatus, String conditionStatus, String rentalTrackingCode) {
+
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, "sa", "")) {
+            // Query the tools table
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+            Tool tool = new Tool(toolCode, toolType, brand, rentalStatus , conditionStatus, rentalTrackingCode);
+            preparedStatement.setString(1, (String) tool.getToolCode());
+            preparedStatement.setString(2, (String) tool.getToolType().toString());
+            preparedStatement.setString(3, (String) tool.getBrand());
+            preparedStatement.setString(4, (String) tool.getRentalStatus().toString());
+            preparedStatement.setString(5, (String) tool.getConditionStatus());
+            preparedStatement.setString(6, (String) tool.getRentalTrackingCode());
+
+            preparedStatement.execute();
+
+            return true;
+        }catch(Exception e){
+            log.error("Issue adding new tool.", e);
+            return false;
+        }
     }
 }

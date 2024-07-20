@@ -2,6 +2,7 @@ package com.tool.database;
 
 import com.tool.database.constants.Column;
 import com.tool.database.constants.ToolStatus;
+import com.tool.database.constants.ToolType;
 //import javax.persistence.Column;
 //import javax.persistence.Entity;
 
@@ -9,11 +10,11 @@ public class Tool {
     @Column(name = "toolCode")
     String toolCode ;
     @Column(name = "toolType")
-    String toolType ;
+    ToolType toolType ;
     @Column(name = "brand")
     String brand ;
     @Column(name = "rentalStatus")
-    String rentalStatus ;
+    ToolStatus rentalStatus ;
     @Column(name = "conditionStatus")
     String conditionStatus ;
     @Column(name = "rentalTrackingCode")
@@ -23,11 +24,11 @@ public class Tool {
     public Tool() {
     }
 
-    public Tool(String toolCode, String toolType, String brand, String rentalStatus, String conditionStatus, String rentalTrackingCode) {
+    public Tool(String toolCode, ToolType toolType, String brand, ToolStatus rentalStatus, String conditionStatus, String rentalTrackingCode) {
         this.toolCode = toolCode;
         this.toolType = toolType;
         this.brand = brand;
-        setRentalStatus(rentalStatus);
+        this.rentalStatus = rentalStatus;
         this.conditionStatus = conditionStatus;
         this.rentalTrackingCode = rentalTrackingCode;
     }
@@ -40,12 +41,15 @@ public class Tool {
         this.toolCode = toolCode;
     }
 
-    public String getToolType() {
+    public ToolType getToolType() {
         return toolType;
     }
 
-    public void setToolType(String toolType) {
+    public void setToolType(ToolType toolType) {
         this.toolType = toolType;
+    }
+    public void setToolType(String toolType) {
+        this.toolType = ToolType.valueOf(toolType);
     }
 
     public String getBrand() {
@@ -57,17 +61,21 @@ public class Tool {
     }
 
     public ToolStatus getRentalStatus() {
-        return ToolStatus.valueOf(rentalStatus);
+        return rentalStatus;
     }
 
+    @Column(name="rentalStatus")
+    public void setRentalStatus(ToolStatus rentalStatus) {
+        this.rentalStatus = rentalStatus;
+    }
     @Column(name="rentalStatus")
     public void setRentalStatus(String rentalStatus) {
         try {
             if(ToolStatus.valueOf(rentalStatus).toString().equals(rentalStatus)){
-                this.rentalStatus = rentalStatus;
+                this.rentalStatus = ToolStatus.valueOf(rentalStatus);
             }
         }catch (Exception e){
-            this.rentalStatus = ToolStatus.PENDING_INSPECTION.toString();
+            this.rentalStatus = ToolStatus.PENDING_INSPECTION;
         }
     }
 
@@ -89,14 +97,9 @@ public class Tool {
 
     @Override
     public String toString() {
-        return "Tool{" +
-                "toolCode='" + toolCode + '\'' +
-                ", toolType='" + toolType + '\'' +
-                ", brand='" + brand + '\'' +
-                ", rentalStatus='" + rentalStatus + '\'' +
-                ", conditionStatus='" + conditionStatus + '\'' +
-                ", rentalTrackingCode='" + rentalTrackingCode + '\'' +
-                '}';
+        return toolType.toString() + ' ' +
+                ", " + brand + '\'' +
+                ", " + conditionStatus + '\'';
     }
 
 }
