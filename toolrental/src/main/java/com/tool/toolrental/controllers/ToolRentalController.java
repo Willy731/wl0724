@@ -1,6 +1,9 @@
-package com.tool.toolrental;
+package com.tool.toolrental.controllers;
 
 import com.tool.database.*;
+import com.tool.toolrental.agreements.PdfRentalAgreementGenerator;
+import com.tool.toolrental.agreements.RentalAgreement;
+import com.tool.utils.FileOpener;
 import com.tool.utils.PaymentUtils;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -50,7 +53,42 @@ public class ToolRentalController implements Initializable {
         /*
         Print the agreement and write to the DB
          */
+        if(renter != null && clerk != null && toolPicker!= null ){
+
+            try {
+                RentalAgreement agreement = new RentalAgreement();
+                agreement.setRenterName(renter.getFirstName() + ' ' + renter.getLastName());
+                agreement.setRenterContactNumber(renter.getMobilePhoneNumber());
+                agreement.setToolCode(selectedTool.getToolCode());
+                agreement.setToolType(selectedTool.getToolType().toString());
+                agreement.setToolBrand(selectedTool.getBrand());
+                agreement.setRentalDays(rentalDays);
+                agreement.setCheckOutDate(checkoutDate);
+                agreement.setDueDate(checkoutDate.plusDays(rentalDays));
+                agreement.setDailyRentalCharge(Double.parseDouble(chargeObj.getDailyCharge()));
+                agreement.setChargeDays(chargeDays);
+                agreement.setPreDiscountCharge(preDiscountAmount);
+                agreement.setDiscountPercent(discount);
+                agreement.setDiscountAmount(discountAmount);
+                agreement.setFinalCharge(finalChargeAmount);
+                agreement.setDate(LocalDate.now());
+                agreement.setClerkIdNumber(String.valueOf(clerk.getId()));
+
+                String pdfPath = "rental_agreement.pdf";
+                PdfRentalAgreementGenerator.generatePdf(agreement, pdfPath);
+
+                FileOpener.OpenFile(pdfPath);
+            }catch (Exception e){
+                log.error("issue creating and opening pdf", e);
+            }
+        }
     }
+    private String preDiscountAmount;
+    private String discountAmount;
+    private String finalChargeAmount;
+    private int chargeDays;
+    private Renter renter = null;
+    private Clerk clerk = null;
     private Tool selectedTool;
     private LocalDate checkoutDate;
     private int rentalDays;
@@ -71,6 +109,14 @@ public class ToolRentalController implements Initializable {
      * discountAmount       discountAmountLabel
      * finalCharge          finalChargeLabel
      */
+    @FXML
+    protected void onRenterSelectionChange() {
+        renter = renterComboBox.getValue();
+    }
+    @FXML
+    protected void onClerkSelectionChange() {
+        clerk = clerkComboBox.getValue();
+    }
     @FXML
     protected void onToolSelectionChange() {
         selectedTool = toolPicker.getValue();
@@ -111,10 +157,13 @@ public class ToolRentalController implements Initializable {
             LocalDate startDate = checkoutDatePicker.getValue();
             LocalDate endDate = checkoutDatePicker.getValue().plusDays(rentalDaySpinner.getValue());
 
-            int chargeDays = paymentUtils.countChargeDays(startDate, endDate, chargeObj);
-            preDiscountLabel.setText(paymentUtils.format(paymentUtils.calculateRate(chargeObj, chargeDays)));
-            discountAmountLabel.setText(paymentUtils.format(paymentUtils.calculateDiscount(chargeObj, chargeDays,discount)));
-            finalChargeLabel.setText(paymentUtils.format(paymentUtils.calculateAmountOwed(chargeObj, chargeDays,discount)));
+            chargeDays = paymentUtils.countChargeDays(startDate, endDate, chargeObj);
+            preDiscountAmount = paymentUtils.format(paymentUtils.calculateRate(chargeObj, chargeDays));
+            discountAmount = paymentUtils.format(paymentUtils.calculateDiscount(chargeObj, chargeDays,discount));
+            finalChargeAmount = paymentUtils.format(paymentUtils.calculateAmountOwed(chargeObj, chargeDays,discount));
+            preDiscountLabel.setText(preDiscountAmount);
+            discountAmountLabel.setText(discountAmount);
+            finalChargeLabel.setText(finalChargeAmount);
 
         }
     }

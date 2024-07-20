@@ -1,20 +1,5 @@
-package com.tool.toolrental;
+package com.tool.toolrental.controllers;
 
-import com.tool.database.Tool;
-import com.tool.database.ToolsDB;
-import javafx.fxml.Initializable;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
-import java.util.List;
-
-import static com.tool.database.constants.DBConstants.jdbcUrl;
 //
 public class ToolController {
 //    private static final Logger log = LoggerFactory.getLogger(ToolController.class);

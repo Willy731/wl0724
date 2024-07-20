@@ -5,7 +5,7 @@
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="vBox" centerShape="false" pickOnBounds="false" prefHeight="466.0" prefWidth="447.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tool.toolrental.ToolRentalController">
+<VBox fx:id="vBox" centerShape="false" pickOnBounds="false" prefHeight="466.0" prefWidth="447.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tool.toolrental.controllers.ToolRentalController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -19,10 +19,10 @@
          <Label layoutX="82.0" layoutY="126.0" text="Renter:" />
          <DatePicker fx:id="checkoutDatePicker" layoutX="176.0" layoutY="36.0" onAction="#onCheckoutDateChange" />
          <Spinner fx:id="rentalDaySpinner" editable="true" layoutX="176.0" layoutY="65.0" prefHeight="25.0" prefWidth="174.0" />
-         <ComboBox fx:id="renterComboBox" layoutX="176.0" layoutY="122.0" prefHeight="25.0" prefWidth="174.0" promptText="Choose Renter" />
+         <ComboBox fx:id="renterComboBox" layoutX="176.0" layoutY="122.0" onAction="#onRenterSelectionChange" prefHeight="25.0" prefWidth="174.0" promptText="Choose Renter" />
          <Label layoutX="74.0" layoutY="154.0" text="Clerk ID:" />
          <Spinner fx:id="discountSpinner" editable="true" layoutX="176.0" layoutY="94.0" prefHeight="25.0" prefWidth="174.0" />
-         <ComboBox fx:id="clerkComboBox" layoutX="176.0" layoutY="150.0" prefHeight="25.0" prefWidth="174.0" promptText="Choose Clerk" />
+         <ComboBox fx:id="clerkComboBox" layoutX="176.0" layoutY="150.0" onAction="#onClerkSelectionChange" prefHeight="25.0" prefWidth="174.0" promptText="Choose Clerk" />
           <Button alignment="BOTTOM_RIGHT" layoutX="331.0" layoutY="349.0" onAction="#onSubmitButtonClick" text="Submit" />
          <Label layoutX="171.0" layoutY="210.0" text="Pre-discount Charge:" />
          <Label fx:id="preDiscountLabel" contentDisplay="RIGHT" layoutX="327.0" layoutY="210.0" text="0.00" />
