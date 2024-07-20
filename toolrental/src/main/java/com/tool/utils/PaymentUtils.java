@@ -18,6 +18,18 @@ public class PaymentUtils {
         BigDecimal preDiscount = base.add(dailyRate.multiply(new BigDecimal(chargeDays)));
         return preDiscount;
     }
+    public BigDecimal calculateDiscount(Charge charge, int chargeDays, int discount){
+        BigDecimal base = new BigDecimal(charge.getBaseCharge());
+        BigDecimal dailyRate = new BigDecimal(charge.getDailyCharge());
+        BigDecimal preDiscount = base.add(dailyRate.multiply(new BigDecimal(chargeDays)));
+        return preDiscount.multiply(new BigDecimal(discount/100.0));
+    }
+    public BigDecimal calculateAmountOwed(Charge charge, int chargeDays, int discount){
+        BigDecimal base = new BigDecimal(charge.getBaseCharge());
+        BigDecimal dailyRate = new BigDecimal(charge.getDailyCharge());
+        BigDecimal preDiscount = base.add(dailyRate.multiply(new BigDecimal(chargeDays)));
+        return preDiscount.multiply(new BigDecimal((100.0-discount)/100.0));
+    }
 
     public BigDecimal applyPercentage(BigDecimal amount, BigDecimal percentage) {
         return amount.multiply(percentage).divide(BigDecimal.valueOf(100), currency.getDefaultFractionDigits(), BigDecimal.ROUND_HALF_UP);

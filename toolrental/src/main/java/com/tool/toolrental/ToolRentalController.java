@@ -2,6 +2,8 @@ package com.tool.toolrental;
 
 import com.tool.database.*;
 import com.tool.utils.PaymentUtils;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
@@ -49,7 +51,13 @@ public class ToolRentalController implements Initializable {
         Print the agreement and write to the DB
          */
     }
-
+    private Tool selectedTool;
+    private LocalDate checkoutDate;
+    private int rentalDays;
+    private int discount;
+    private ChargeDB chargeDB;
+    private List<Charge> charges;
+    private Charge chargeObj;
     /**
      * id
      * toolId
@@ -64,34 +72,51 @@ public class ToolRentalController implements Initializable {
      * finalCharge          finalChargeLabel
      */
     @FXML
-    protected void onSelectionChange() {
-        if(toolPicker.getValue()!=null
-                && checkoutDatePicker.getValue()!=null
-                && rentalDaySpinner.getValue()!=null
-                && discountSpinner.getValue()!=null){
+    protected void onToolSelectionChange() {
+        selectedTool = toolPicker.getValue();
+        updateSummaryLabels();
+    }
+
+    @FXML
+    protected void onCheckoutDateChange() {
+        checkoutDate = checkoutDatePicker.getValue();
+        updateSummaryLabels();
+    }
+
+    @FXML
+    protected void onDiscountChange() {
+        discount = discountSpinner.getValue();
+        updateSummaryLabels();
+    }
+
+    @FXML
+    protected void onRentalDaysChange() {
+        rentalDays = rentalDaySpinner.getValue();
+        updateSummaryLabels();
+    }
+
+    private void updateSummaryLabels(){
+        if(selectedTool!=null && checkoutDate!=null && rentalDays>0){
+
             PaymentUtils paymentUtils = new PaymentUtils();
-            ChargeDB chargeDB = new ChargeDB();
-
-            Charge chargeObj;
-
-            Optional<Charge> toolCharge = chargeDB.getChargesList().stream()
-                    .filter(charge -> (charge.getToolType().equals(toolPicker.getValue().getToolType())
-                                        && charge.getLevel().equals("1"))).findFirst();
+            Optional<Charge> toolCharge = charges.stream()
+                    .filter(charge -> (charge.getToolType().equals(selectedTool.getToolType())
+                            && charge.getLevel().equals("1"))).findFirst();
             if(toolCharge.isPresent()){
                 chargeObj = toolCharge.get();
             }else{
                 return;
             }
-//            Charge charge = chargeDB.getCharge(toolPicker.getValue().getToolType(), "1");
+
             LocalDate startDate = checkoutDatePicker.getValue();
             LocalDate endDate = checkoutDatePicker.getValue().plusDays(rentalDaySpinner.getValue());
 
             int chargeDays = paymentUtils.countChargeDays(startDate, endDate, chargeObj);
             preDiscountLabel.setText(paymentUtils.format(paymentUtils.calculateRate(chargeObj, chargeDays)));
-        }else{
-            log.error("else");
-        }
+            discountAmountLabel.setText(paymentUtils.format(paymentUtils.calculateDiscount(chargeObj, chargeDays,discount)));
+            finalChargeLabel.setText(paymentUtils.format(paymentUtils.calculateAmountOwed(chargeObj, chargeDays,discount)));
 
+        }
     }
 
     private static final Logger log = LoggerFactory.getLogger(ToolController.class);
@@ -127,20 +152,40 @@ public class ToolRentalController implements Initializable {
         initCheckoutDate();
         initRenters();
         initClerks();
+
+        chargeDB = new ChargeDB();
+        charges = chargeDB.getChargesList();
+        rentalDaySpinner.valueProperty().addListener(new ChangeListener<Integer>() {
+            @Override
+            public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
+                rentalDays = rentalDaySpinner.getValue();
+                updateSummaryLabels();
+            }
+        });
+        discountSpinner.valueProperty().addListener(new ChangeListener<Integer>() {
+            @Override
+            public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
+                discount = discountSpinner.getValue();
+                updateSummaryLabels();
+            }
+        });
     }
     private void initCheckoutDate(){
         checkoutDatePicker.setValue(LocalDate.now());
+        checkoutDate = checkoutDatePicker.getValue();
     }
     private void initRentalDaySpinner(){
-        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100);
         valueFactory.setValue(1);
         rentalDaySpinner.setValueFactory(valueFactory);
+        rentalDays = rentalDaySpinner.getValue();
     }
 
     private void initDiscountSpinner(){
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
         valueFactory.setValue(0);
         discountSpinner.setValueFactory(valueFactory);
+        discount = discountSpinner.getValue();
     }
 
     private void initTools(){
