@@ -1,6 +1,7 @@
-package com.tool.database;
+package com.tool.toolrental.dao;
 
-import com.tool.database.constants.ToolStatus;
+import com.tool.toolrental.model.Renter;
+import com.tool.toolrental.utils.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tool.database.constants.DBConstants.jdbcUrl;
+import static com.tool.toolrental.constants.DBConstants.jdbcUrl;
 
 public class RenterDB {
     private static final Logger log = LoggerFactory.getLogger(RenterDB.class);
@@ -59,14 +60,7 @@ public class RenterDB {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             // Example data to insert
-            List<Renter> renterList = new ArrayList<>();
-
-            renterList.add(new Renter("Billy", "Thornton", "123 A Street" , "Boston",
-                    "MA", "02360", "5081231568", ""));
-            renterList.add(new Renter("Cheryl", "Bozeman", "234 Streetville Drive" , "Boston",
-                    "MA", "02360", "5084444444", ""));
-            renterList.add(new Renter("William", "Lucas", "456 Worth Drive" , "Boston",
-                    "MA", "02360", "8501652368", "4561234568"));
+            List<Renter> renterList = testRentersList();
 
             // Insert each entry using the prepared statement
             for (Renter renter : renterList) {
@@ -101,10 +95,6 @@ public class RenterDB {
             ResultSetMapper<Renter> mapper = new ResultSetMapper<>();
             List<Renter> renters = mapper.map(resultSet, Renter.class);
 
-            // Print the tools
-            for (Renter renter : renters) {
-                log.debug(renter.toString());
-            }
             return renters;
         }catch(Exception e){
             log.error("Issue with converting Renters list");
@@ -141,5 +131,19 @@ public class RenterDB {
             log.error("Issue adding new Renter.", e);
             return false;
         }
+    }
+
+    public static List<Renter> testRentersList(){
+
+        List<Renter> renterList = new ArrayList<>();
+
+        renterList.add(new Renter("Billy", "Thornton", "123 A Street" , "Boston",
+                "MA", "02360", "5081231568", ""));
+        renterList.add(new Renter("Cheryl", "Bozeman", "234 Streetville Drive" , "Boston",
+                "MA", "02360", "5084444444", ""));
+        renterList.add(new Renter("William", "Lucas", "456 Worth Drive" , "Boston",
+                "MA", "02360", "8501652368", "4561234568"));
+
+        return renterList;
     }
 }

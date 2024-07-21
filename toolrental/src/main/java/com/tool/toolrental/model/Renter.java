@@ -1,6 +1,6 @@
-package com.tool.database;
+package com.tool.toolrental.model;
 
-import com.tool.database.constants.Column;
+import com.tool.toolrental.constants.Column;
 
 public class Renter {
     @Column(name="firstName")
@@ -126,5 +126,9 @@ public class Renter {
     @Override
     public String toString() {
         return firstName + ' ' + lastName + ' ' + mobilePhoneNumber;
+    }
+
+    public String getName() {
+        return firstName + ' ' + lastName;
     }
 }

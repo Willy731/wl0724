@@ -1,10 +1,14 @@
 package com.tool.toolrental.controllers;
 
-import com.tool.database.*;
+import com.tool.toolrental.dao.*;
 import com.tool.toolrental.agreements.PdfRentalAgreementGenerator;
 import com.tool.toolrental.agreements.RentalAgreement;
-import com.tool.utils.FileOpener;
-import com.tool.utils.PaymentUtils;
+import com.tool.toolrental.dao.ClerkDB;
+import com.tool.toolrental.dao.RenterDB;
+import com.tool.toolrental.dao.ToolsDB;
+import com.tool.toolrental.model.Clerk;
+import com.tool.toolrental.model.Renter;
+import com.tool.toolrental.model.Tool;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.Initializable;
@@ -18,14 +22,16 @@ import javafx.collections.ObservableList;
 
 import javafx.fxml.FXML;
 
-import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ToolRentalController implements Initializable {
+
+    private static final Logger log = LoggerFactory.getLogger(ToolController.class);
+    private RentalAgreement rentalAgreement = new RentalAgreement();
+
     @FXML
     private ComboBox<Tool> toolPicker;
 
@@ -53,122 +59,52 @@ public class ToolRentalController implements Initializable {
         /*
         Print the agreement and write to the DB
          */
-        if(renter != null && clerk != null && toolPicker!= null ){
-
-            try {
-                RentalAgreement agreement = new RentalAgreement();
-                agreement.setRenterName(renter.getFirstName() + ' ' + renter.getLastName());
-                agreement.setRenterContactNumber(renter.getMobilePhoneNumber());
-                agreement.setToolCode(selectedTool.getToolCode());
-                agreement.setToolType(selectedTool.getToolType().toString());
-                agreement.setToolBrand(selectedTool.getBrand());
-                agreement.setRentalDays(rentalDays);
-                agreement.setCheckOutDate(checkoutDate);
-                agreement.setDueDate(checkoutDate.plusDays(rentalDays));
-                agreement.setDailyRentalCharge(Double.parseDouble(chargeObj.getDailyCharge()));
-                agreement.setChargeDays(chargeDays);
-                agreement.setPreDiscountCharge(preDiscountAmount);
-                agreement.setDiscountPercent(discount);
-                agreement.setDiscountAmount(discountAmount);
-                agreement.setFinalCharge(finalChargeAmount);
-                agreement.setDate(LocalDate.now());
-                agreement.setClerkIdNumber(String.valueOf(clerk.getId()));
-
-                String pdfPath = "rental_agreement.pdf";
-                PdfRentalAgreementGenerator.generatePdf(agreement, pdfPath);
-
-                FileOpener.OpenFile(pdfPath);
-            }catch (Exception e){
-                log.error("issue creating and opening pdf", e);
-            }
-        }
+        PdfRentalAgreementGenerator.printAggreement(rentalAgreement);
     }
-    private String preDiscountAmount;
-    private String discountAmount;
-    private String finalChargeAmount;
-    private int chargeDays;
-    private Renter renter = null;
-    private Clerk clerk = null;
-    private Tool selectedTool;
-    private LocalDate checkoutDate;
-    private int rentalDays;
-    private int discount;
-    private ChargeDB chargeDB;
-    private List<Charge> charges;
-    private Charge chargeObj;
-    /**
-     * id
-     * toolId
-     * renterId
-     * clerkId
-     * rentalDays
-     * checkoutDate
-     * chargeDays
-     * preDiscountCharge    preDiscountLabel
-     * discountPercent
-     * discountAmount       discountAmountLabel
-     * finalCharge          finalChargeLabel
-     */
+
+
+
     @FXML
     protected void onRenterSelectionChange() {
-        renter = renterComboBox.getValue();
+        rentalAgreement.setRenter(renterComboBox.getValue());
     }
     @FXML
     protected void onClerkSelectionChange() {
-        clerk = clerkComboBox.getValue();
+        rentalAgreement.setClerk(clerkComboBox.getValue());
     }
     @FXML
     protected void onToolSelectionChange() {
-        selectedTool = toolPicker.getValue();
+        rentalAgreement.setSelectedTool(toolPicker.getValue());
         updateSummaryLabels();
     }
 
     @FXML
     protected void onCheckoutDateChange() {
-        checkoutDate = checkoutDatePicker.getValue();
+        rentalAgreement.setCheckOutDate(checkoutDatePicker.getValue());
         updateSummaryLabels();
     }
 
     @FXML
     protected void onDiscountChange() {
-        discount = discountSpinner.getValue();
+        rentalAgreement.setDiscountPercent(discountSpinner.getValue());
         updateSummaryLabels();
     }
 
     @FXML
     protected void onRentalDaysChange() {
-        rentalDays = rentalDaySpinner.getValue();
+        rentalAgreement.setRentalDays(rentalDaySpinner.getValue());
         updateSummaryLabels();
     }
 
     private void updateSummaryLabels(){
-        if(selectedTool!=null && checkoutDate!=null && rentalDays>0){
-
-            PaymentUtils paymentUtils = new PaymentUtils();
-            Optional<Charge> toolCharge = charges.stream()
-                    .filter(charge -> (charge.getToolType().equals(selectedTool.getToolType())
-                            && charge.getLevel().equals("1"))).findFirst();
-            if(toolCharge.isPresent()){
-                chargeObj = toolCharge.get();
-            }else{
-                return;
-            }
-
-            LocalDate startDate = checkoutDatePicker.getValue();
-            LocalDate endDate = checkoutDatePicker.getValue().plusDays(rentalDaySpinner.getValue());
-
-            chargeDays = paymentUtils.countChargeDays(startDate, endDate, chargeObj);
-            preDiscountAmount = paymentUtils.format(paymentUtils.calculateRate(chargeObj, chargeDays));
-            discountAmount = paymentUtils.format(paymentUtils.calculateDiscount(chargeObj, chargeDays,discount));
-            finalChargeAmount = paymentUtils.format(paymentUtils.calculateAmountOwed(chargeObj, chargeDays,discount));
-            preDiscountLabel.setText(preDiscountAmount);
-            discountAmountLabel.setText(discountAmount);
-            finalChargeLabel.setText(finalChargeAmount);
-
+        if(rentalAgreement.getSelectedTool()!=null && rentalAgreement.getCheckOutDate()!=null
+                && rentalAgreement.getRentalDays()>0){
+            preDiscountLabel.setText(rentalAgreement.getPreDiscountCharge());
+            discountAmountLabel.setText(rentalAgreement.getDiscountAmount());
+            finalChargeLabel.setText(rentalAgreement.getFinalCharge());
         }
     }
 
-    private static final Logger log = LoggerFactory.getLogger(ToolController.class);
 
 
     private ObservableList<Tool> getToolList() {
@@ -202,39 +138,37 @@ public class ToolRentalController implements Initializable {
         initRenters();
         initClerks();
 
-        chargeDB = new ChargeDB();
-        charges = chargeDB.getChargesList();
         rentalDaySpinner.valueProperty().addListener(new ChangeListener<Integer>() {
             @Override
             public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
-                rentalDays = rentalDaySpinner.getValue();
+                rentalAgreement.setRentalDays(rentalDaySpinner.getValue());
                 updateSummaryLabels();
             }
         });
         discountSpinner.valueProperty().addListener(new ChangeListener<Integer>() {
             @Override
             public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
-                discount = discountSpinner.getValue();
+                rentalAgreement.setDiscountPercent(discountSpinner.getValue());
                 updateSummaryLabels();
             }
         });
     }
     private void initCheckoutDate(){
         checkoutDatePicker.setValue(LocalDate.now());
-        checkoutDate = checkoutDatePicker.getValue();
+        rentalAgreement.setCheckOutDate(checkoutDatePicker.getValue());
     }
     private void initRentalDaySpinner(){
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100);
         valueFactory.setValue(1);
         rentalDaySpinner.setValueFactory(valueFactory);
-        rentalDays = rentalDaySpinner.getValue();
+        rentalAgreement.setRentalDays(rentalDaySpinner.getValue());
     }
 
     private void initDiscountSpinner(){
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
         valueFactory.setValue(0);
         discountSpinner.setValueFactory(valueFactory);
-        discount = discountSpinner.getValue();
+        rentalAgreement.setDiscountPercent(discountSpinner.getValue());
     }
 
     private void initTools(){

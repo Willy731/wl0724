@@ -1,6 +1,8 @@
-package com.tool.database;
+package com.tool.toolrental.dao;
 
-import com.tool.database.constants.ToolType;
+import com.tool.toolrental.constants.ToolType;
+import com.tool.toolrental.model.Charge;
+import com.tool.toolrental.utils.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tool.database.constants.DBConstants.jdbcUrl;
+import static com.tool.toolrental.constants.DBConstants.jdbcUrl;
 
 public class ChargeDB {    
     /*
@@ -44,7 +46,7 @@ public class ChargeDB {
     public void Initialize(Connection connection){
 
         try(Statement statement = connection.createStatement()) {
-            // Create the tools table
+            // Create the table
             String createTableSQL = "CREATE TABLE IF NOT EXISTS charge ("
                     + "toolType VARCHAR(255),"
                     + "level VARCHAR(255),"
@@ -66,32 +68,7 @@ public class ChargeDB {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             // Example data to insert
-            List<Charge> chargeList = new ArrayList<>();
-
-            chargeList.add(new Charge(
-                    ToolType.JACKHAMMER,
-                    "1",
-                    "2.99",
-                    true,
-                    false,
-                    false,
-                    "0.00"));
-            chargeList.add(new Charge(
-                    ToolType.CHAINSAW,
-                    "1",
-                    "1.49",
-                    true,
-                    false,
-                    true,
-                    "0.00"));
-            chargeList.add(new Charge(
-                    ToolType.LADDER,
-                    "1",
-                    "1.99",
-                    true,
-                    true,
-                    false,
-                    "0.00"));
+            List<Charge> chargeList = testChargeList();
 
             // Insert each entry using the prepared statement
             for (Charge charge : chargeList) {
@@ -115,7 +92,7 @@ public class ChargeDB {
     }
     public Charge getCharge(ToolType toolType, String level){
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "sa", "")) {
-            // Query the tools table
+            // Query the table
             String querySQL = "SELECT * FROM charge WHERE toolType = ? AND level = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(querySQL);
             preparedStatement.setString(1, toolType.toString());
@@ -123,35 +100,27 @@ public class ChargeDB {
 
             ResultSet resultSet = preparedStatement.getResultSet();
 
-            // Map ResultSet to List of Tool objects
+            // Map ResultSet to List of objects
             ResultSetMapper<Charge> mapper = new ResultSetMapper<>();
             List<Charge> charges = mapper.map(resultSet, Charge.class);
 
-            // Print the tools
-            for (Charge charge : charges) {
-                log.debug(charge.toString());
-            }
             return charges.getFirst();
         }catch(Exception e){
             log.error("Issue selecting one charge");
         }
         return null;
     }
-    public List<Charge> getChargesList(){
+    public static List<Charge> getChargesList(){
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "sa", "")) {
-            // Query the tools table
+            // Query the table
             Statement statement = connection.createStatement();
             String querySQL = "SELECT * FROM charge";
             ResultSet resultSet = statement.executeQuery(querySQL);
 
-            // Map ResultSet to List of Tool objects
+            // Map ResultSet to List of objects
             ResultSetMapper<Charge> mapper = new ResultSetMapper<>();
             List<Charge> charges = mapper.map(resultSet, Charge.class);
 
-            // Print the tools
-            for (Charge charge : charges) {
-                log.debug(charge.toString());
-            }
             return charges;
         }catch(Exception e){
             log.error("Issue with converting Charges list");
@@ -162,7 +131,7 @@ public class ChargeDB {
     public boolean insertNewCharge(ToolType toolType, String level, String dailyCharge, boolean weekdayCharge, boolean weekendCharge, boolean holidayCharge, String baseCharge) {
 
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "sa", "")) {
-            // Query the tools table
+            // Query the table
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             Charge charge = new Charge(toolType,
                     level,
@@ -186,5 +155,36 @@ public class ChargeDB {
             log.error("Issue adding new Charge.", e);
             return false;
         }
+    }
+
+    public static List<Charge> testChargeList(){
+
+        List<Charge> chargeList = new ArrayList<>();
+
+        chargeList.add(new Charge(
+                ToolType.JACKHAMMER,
+                "1",
+                "2.99",
+                true,
+                false,
+                false,
+                "0.00"));
+        chargeList.add(new Charge(
+                ToolType.CHAINSAW,
+                "1",
+                "1.49",
+                true,
+                false,
+                true,
+                "0.00"));
+        chargeList.add(new Charge(
+                ToolType.LADDER,
+                "1",
+                "1.99",
+                true,
+                true,
+                false,
+                "0.00"));
+        return chargeList;
     }
 }

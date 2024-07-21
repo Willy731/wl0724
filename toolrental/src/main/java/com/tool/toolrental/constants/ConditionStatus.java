@@ -1,4 +1,4 @@
-package com.tool.database.constants;
+package com.tool.toolrental.constants;
 
 public enum ConditionStatus {
     NEW,

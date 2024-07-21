@@ -1,6 +1,6 @@
 package com.tool.toolrental;
 
-import com.tool.database.ToolRentalDB;
+import com.tool.toolrental.dao.ToolRentalDB;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

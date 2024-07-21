@@ -1,5 +1,7 @@
-package com.tool.database;
+package com.tool.toolrental.dao;
 
+import com.tool.toolrental.model.RentTracker;
+import com.tool.toolrental.utils.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tool.database.constants.DBConstants.jdbcUrl;
+import static com.tool.toolrental.constants.DBConstants.jdbcUrl;
 
 public class RentTrackerDB {
 
@@ -54,7 +56,7 @@ public class RentTrackerDB {
     public void Initialize(Connection connection){
 
         try(Statement statement = connection.createStatement()) {
-            // Create the tools table
+            // Create the rentTracker table
             String createTableSQL = "CREATE TABLE IF NOT EXISTS rentTracker ("
                     + "id INT PRIMARY KEY AUTO_INCREMENT,"
                     + "toolId VARCHAR(255),"
@@ -120,19 +122,15 @@ public class RentTrackerDB {
 
     public List<RentTracker> getRentersList(){
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "sa", "")) {
-            // Query the tools table
+            // Query the rentTracker table
             Statement statement = connection.createStatement();
             String querySQL = "SELECT * FROM rentTracker";
             ResultSet resultSet = statement.executeQuery(querySQL);
 
-            // Map ResultSet to List of Tool objects
+            // Map ResultSet to List of rentTracker objects
             ResultSetMapper<RentTracker> mapper = new ResultSetMapper<>();
             List<RentTracker> rentTrackers = mapper.map(resultSet, RentTracker.class);
 
-            // Print the tools
-            for (RentTracker renter : rentTrackers) {
-                log.debug(renter.toString());
-            }
             return rentTrackers;
         }catch(Exception e){
             log.error("Issue with converting Renters list");
@@ -143,7 +141,7 @@ public class RentTrackerDB {
     public boolean insertNewRentTracker(String toolId, Integer renterId, Integer clerkId, String rentalDays, String checkoutDate, String chargeDays, String preDiscountCharge, String discountPercent, String discountAmount, String finalCharge) {
 
         try (Connection connection = DriverManager.getConnection(jdbcUrl, "sa", "")) {
-            // Query the tools table
+            // Query the rentTracker table
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             RentTracker rentTrack = new RentTracker(
                     toolId,

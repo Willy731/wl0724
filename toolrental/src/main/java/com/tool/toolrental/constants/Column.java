@@ -1,4 +1,4 @@
-package com.tool.database.constants;
+package com.tool.toolrental.constants;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

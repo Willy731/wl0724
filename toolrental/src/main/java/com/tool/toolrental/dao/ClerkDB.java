@@ -1,5 +1,7 @@
-package com.tool.database;
+package com.tool.toolrental.dao;
 
+import com.tool.toolrental.model.Clerk;
+import com.tool.toolrental.utils.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tool.database.constants.DBConstants.jdbcUrl;
+import static com.tool.toolrental.constants.DBConstants.jdbcUrl;
 
 public class ClerkDB {
     private static final Logger log = LoggerFactory.getLogger(ClerkDB.class);
@@ -58,14 +60,7 @@ public class ClerkDB {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             // Example data to insert
-            List<Clerk> clerkList = new ArrayList<>();
-
-            clerkList.add(new Clerk("Sue", "Bob", "Over There Rd" , "Plymouth",
-                    "MA", "02360", "5081444444", ""));
-            clerkList.add(new Clerk("Frank", "Williams", "2 Not Main Street" , "Plymouth",
-                    "MA", "02360", "5083333333", ""));
-            clerkList.add(new Clerk("Bill", "Hernandez", "3 Main Street" , "Plymouth",
-                    "MA", "02360", "5081566666", "4085151515"));
+            List<Clerk> clerkList = testClerksList();
 
             // Insert each entry using the prepared statement
             for (Clerk clerk : clerkList) {
@@ -96,14 +91,10 @@ public class ClerkDB {
             String querySQL = "SELECT * FROM clerk";
             ResultSet resultSet = statement.executeQuery(querySQL);
 
-            // Map ResultSet to List of Tool objects
+            // Map ResultSet to List of Clerk objects
             ResultSetMapper<Clerk> mapper = new ResultSetMapper<>();
             List<Clerk> clerks = mapper.map(resultSet, Clerk.class);
 
-            // Print the tools
-            for (Clerk clerk : clerks) {
-                log.debug(clerk.toString());
-            }
             return clerks;
         }catch(Exception e){
             log.error("Issue with converting Clerks list");
@@ -140,5 +131,35 @@ public class ClerkDB {
             log.error("Issue adding new Clerk.", e);
             return false;
         }
+    }
+
+    public static List<Clerk> testClerksList(){
+        List<Clerk> clerkList = new ArrayList<>();
+
+        clerkList.add(new Clerk("Sue", "Bob", "Over There Rd" , "Plymouth",
+                "MA", "02360", "5081444444", ""));
+        clerkList.add(new Clerk("Frank", "Williams", "2 Not Main Street" , "Plymouth",
+                "MA", "02360", "5083333333", ""));
+        clerkList.add(new Clerk("Bill", "Hernandez", "3 Main Street" , "Plymouth",
+                "MA", "02360", "5081566666", "4085151515"));
+
+        return clerkList;
+    }
+
+    /**
+     * Used for mocking the database id insertions.
+     * @return
+     */
+    public static List<Clerk> testClerksListWithId(){
+        List<Clerk> clerkList = new ArrayList<>();
+
+        clerkList.add(new Clerk("Sue", "Bob", "Over There Rd" , "Plymouth",
+                "MA", "02360", "5081444444", "", 1));
+        clerkList.add(new Clerk("Frank", "Williams", "2 Not Main Street" , "Plymouth",
+                "MA", "02360", "5083333333", "", 2));
+        clerkList.add(new Clerk("Bill", "Hernandez", "3 Main Street" , "Plymouth",
+                "MA", "02360", "5081566666", "4085151515", 3));
+
+        return clerkList;
     }
 }

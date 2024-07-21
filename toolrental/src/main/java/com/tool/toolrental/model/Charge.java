@@ -1,7 +1,7 @@
-package com.tool.database;
+package com.tool.toolrental.model;
 
-import com.tool.database.constants.Column;
-import com.tool.database.constants.ToolType;
+import com.tool.toolrental.constants.Column;
+import com.tool.toolrental.constants.ToolType;
 
 public class Charge {
     /*

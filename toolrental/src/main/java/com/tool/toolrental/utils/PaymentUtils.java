@@ -1,7 +1,7 @@
-package com.tool.utils;
+package com.tool.toolrental.utils;
 
-import com.tool.database.Charge;
-import com.tool.database.HolidayCalendarDB;
+import com.tool.toolrental.model.Charge;
+import com.tool.toolrental.dao.HolidayCalendarDB;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -58,7 +58,7 @@ public class PaymentUtils {
         }
     }
 
-    private static int observedHolidays(LocalDate startDate, LocalDate endDate) {
+    public int observedHolidays(LocalDate startDate, LocalDate endDate) {
         HolidayCalendarDB holidayDB = new HolidayCalendarDB();
         return holidayDB.getHolidayCalendarsList(startDate, endDate).size();
     }

@@ -1,7 +1,5 @@
-package com.tool.utils;
+package com.tool.toolrental.utils;
 
-import com.tool.database.RenterDB;
-import org.h2.store.fs.FilePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

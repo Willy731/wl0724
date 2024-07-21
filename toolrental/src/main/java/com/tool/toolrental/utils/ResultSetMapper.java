@@ -1,6 +1,6 @@
-package com.tool.database;
+package com.tool.toolrental.utils;
 
-import com.tool.database.constants.Column;
+import com.tool.toolrental.constants.Column;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

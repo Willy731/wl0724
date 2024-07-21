@@ -1,15 +1,19 @@
-package com.tool.database;
+package com.tool.toolrental.dao;
 
+import com.tool.toolrental.model.HolidayCalendar;
+import com.tool.toolrental.utils.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.tool.database.constants.DBConstants.jdbcUrl;
+import static com.tool.toolrental.constants.DBConstants.jdbcUrl;
 
 
 public class HolidayCalendarDB {    /*
@@ -48,10 +52,7 @@ public class HolidayCalendarDB {    /*
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             // Example data to insert
-            List<HolidayCalendar> holidayCalendarList = new ArrayList<>();
-            holidayCalendarList.add(new HolidayCalendar("Independence Day", LocalDate.of(2024,7,4)));
-            holidayCalendarList.add(new HolidayCalendar("LaborDay", LocalDate.of(2024,8,2)));
-
+            List<HolidayCalendar> holidayCalendarList = testHolidayCalendarList();
 
             // Insert each entry using the prepared statement
             for (HolidayCalendar holidayCalendar : holidayCalendarList) {
@@ -82,10 +83,6 @@ public class HolidayCalendarDB {    /*
             ResultSetMapper<HolidayCalendar> mapper = new ResultSetMapper<>();
             List<HolidayCalendar> holidays = mapper.map(resultSet, HolidayCalendar.class);
 
-            // Print the holidayCalendar
-            for (HolidayCalendar holiday : holidays) {
-                log.info(holiday.toString());
-            }
             return filterEventsByDateRange(holidays,startDate, endDate);
         }catch(Exception e){
             log.error("Issue with converting HolidayCalendars list");
@@ -114,6 +111,24 @@ public class HolidayCalendarDB {    /*
             log.error("Issue adding new holidayCalendar.", e);
             return false;
         }
+    }
+
+    public static LocalDate getFirstMondayOfSeptember(int year) {
+        // Start with September 1st of the given year
+        LocalDate date = LocalDate.of(year, Month.SEPTEMBER, 1);
+        // Loop through the days of September until we find the first Monday
+        while (date.getDayOfWeek() != DayOfWeek.MONDAY) {
+            date = date.plusDays(1);
+        }
+        return date;
+    }
+    public static List<HolidayCalendar> testHolidayCalendarList(){
+        List<HolidayCalendar> holidayCalendarList = new ArrayList<>();
+        for(int i = 2015; i <= 2024; i++){
+            holidayCalendarList.add(new HolidayCalendar("LaborDay", getFirstMondayOfSeptember(i)));
+            holidayCalendarList.add(new HolidayCalendar("Independence Day", LocalDate.of(i,7,4)));
+        }
+        return holidayCalendarList;
     }
 }
 

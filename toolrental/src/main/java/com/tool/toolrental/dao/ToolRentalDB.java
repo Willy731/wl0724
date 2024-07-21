@@ -1,4 +1,4 @@
-package com.tool.database;
+package com.tool.toolrental.dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +8,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static com.tool.database.constants.DBConstants.jdbcUrl;
+import static com.tool.toolrental.constants.DBConstants.jdbcUrl;
 
 public class ToolRentalDB {
     private static final Logger log = LoggerFactory.getLogger(ToolRentalDB.class);

@@ -1,7 +1,9 @@
-package com.tool.database;
+package com.tool.toolrental.dao;
 
-import com.tool.database.constants.ToolStatus;
-import com.tool.database.constants.ToolType;
+import com.tool.toolrental.constants.ToolStatus;
+import com.tool.toolrental.constants.ToolType;
+import com.tool.toolrental.model.Tool;
+import com.tool.toolrental.utils.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +12,7 @@ import java.util.List;
 
 import java.sql.*;
 
-import static com.tool.database.constants.DBConstants.jdbcUrl;
+import static com.tool.toolrental.constants.DBConstants.jdbcUrl;
 
 public class ToolsDB {
     private static final Logger log = LoggerFactory.getLogger(ToolsDB.class);
@@ -49,12 +51,7 @@ public class ToolsDB {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             // Example data to insert
-            List<Tool> toolsList = new ArrayList<>();
-            toolsList.add(new Tool("CHNS", ToolType.CHAINSAW, "Stihl", ToolStatus.AVAILABLE , "NEW", null));
-            toolsList.add(new Tool("LADW", ToolType.LADDER, "Werner", ToolStatus.AVAILABLE, "USED", null      ));
-            toolsList.add(new Tool("JAKD", ToolType.JACKHAMMER, "DeWalt", ToolStatus.AVAILABLE, "NEW", null));
-            toolsList.add(new Tool("JAKR", ToolType.JACKHAMMER, "Ridgid", ToolStatus.AVAILABLE, "NEW", null));
-            toolsList.add(new Tool("LADS", ToolType.LADDER, "Stihl", ToolStatus.RENTED, "USED", null      ));
+            List<Tool> toolsList = testToolsList();
 
             // Insert each entry using the prepared statement
             for (Tool tool : toolsList) {
@@ -87,10 +84,6 @@ public class ToolsDB {
             ResultSetMapper<Tool> mapper = new ResultSetMapper<>();
             List<Tool> tools = mapper.map(resultSet, Tool.class);
 
-            // Print the tools
-            for (Tool tool : tools) {
-                log.info(tool.toString());
-            }
             return tools;
         }catch(Exception e){
             log.error("Issue with converting Tools list");
@@ -118,5 +111,16 @@ public class ToolsDB {
             log.error("Issue adding new tool.", e);
             return false;
         }
+    }
+
+    public static List<Tool> testToolsList(){
+
+        List<Tool> toolsList = new ArrayList<>();
+        toolsList.add(new Tool("CHNS", ToolType.CHAINSAW, "Stihl", ToolStatus.AVAILABLE , "NEW", null));
+        toolsList.add(new Tool("LADW", ToolType.LADDER, "Werner", ToolStatus.AVAILABLE, "USED", null      ));
+        toolsList.add(new Tool("JAKD", ToolType.JACKHAMMER, "DeWalt", ToolStatus.AVAILABLE, "NEW", null));
+        toolsList.add(new Tool("JAKR", ToolType.JACKHAMMER, "Ridgid", ToolStatus.AVAILABLE, "NEW", null));
+        toolsList.add(new Tool("LADS", ToolType.LADDER, "Stihl", ToolStatus.RENTED, "USED", null      ));
+        return toolsList;
     }
 }
