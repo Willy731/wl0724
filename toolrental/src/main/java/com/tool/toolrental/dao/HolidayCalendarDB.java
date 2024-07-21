@@ -122,11 +122,20 @@ public class HolidayCalendarDB {    /*
         }
         return date;
     }
+    public static LocalDate getObservedHoliday(LocalDate date){
+        if(date.getDayOfWeek().equals(DayOfWeek.SATURDAY)){
+            date = date.minusDays(1);
+        }else if(date.getDayOfWeek().equals(DayOfWeek.SUNDAY)){
+            date = date.plusDays(1);
+        }
+        return date;
+    }
+
     public static List<HolidayCalendar> testHolidayCalendarList(){
         List<HolidayCalendar> holidayCalendarList = new ArrayList<>();
         for(int i = 2015; i <= 2024; i++){
             holidayCalendarList.add(new HolidayCalendar("LaborDay", getFirstMondayOfSeptember(i)));
-            holidayCalendarList.add(new HolidayCalendar("Independence Day", LocalDate.of(i,7,4)));
+            holidayCalendarList.add(new HolidayCalendar("Independence Day", getObservedHoliday(LocalDate.of(i,7,4))));
         }
         return holidayCalendarList;
     }
