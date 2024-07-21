@@ -9,7 +9,7 @@ The Tool Rental Application is a Java-based system that allows users to manage t
 - User-friendly GUI for entering rental data
 - Generates a rental agreement in PDF format
 - Includes preloaded Renter information and Clerk Information for recording in the rental agreement.
-- A DB server for browsing the HW DB will run while the application is run
+- A DB server for browsing the H2 DB will run while the application is run
   - Can be reached at: http://localhost:8082
 
 
