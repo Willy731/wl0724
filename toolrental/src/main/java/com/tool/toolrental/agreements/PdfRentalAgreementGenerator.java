@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
-import java.text.DateFormat;
+import java.time.format.DateTimeFormatter;
 
 public class PdfRentalAgreementGenerator {
     private static final Logger log = LoggerFactory.getLogger(PdfRentalAgreementGenerator.class);
@@ -22,9 +22,9 @@ public class PdfRentalAgreementGenerator {
             PdfWriter writer = new PdfWriter(dest);
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
-
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
             document.add(new Paragraph("Rental Agreement").setBold().setFontSize(28));
-            document.add(new Paragraph("Date: " + agreement.getDate().format("MM/DD/YYYY")));
+            document.add(new Paragraph("Date: " + agreement.getDate().format(dateTimeFormatter)));
             document.add(new Paragraph("Clerk ID: " + agreement.getClerkIdNumber()));
             document.add(new Paragraph("Care and Treatment of Tools:").setBold().setFontSize(20));
             document.add(new Paragraph("The renter agrees to take all reasonable measures to ensure the proper care" +
@@ -47,9 +47,9 @@ public class PdfRentalAgreementGenerator {
             table.addCell("Rental Days");
             table.addCell(String.valueOf(agreement.getRentalDays()));
             table.addCell("Check Out Date");
-            table.addCell(agreement.getCheckOutDate().toString());
+            table.addCell(agreement.getCheckOutDate().format(dateTimeFormatter));
             table.addCell("Due Date");
-            table.addCell(agreement.getDueDate().toString());
+            table.addCell(agreement.getDueDate().format(dateTimeFormatter));
             table.addCell("Daily Rental Charge");
             table.addCell(String.format("$%.2f", agreement.getDailyRentalCharge()));
             table.addCell("Charge Days");
@@ -65,7 +65,7 @@ public class PdfRentalAgreementGenerator {
 
             document.add(table);
 
-            document.add(new Paragraph("\n\nSignature: ___________________________"));
+            document.add(new Paragraph("\n\nSignature: ___________________________   Date __________"));
 
             document.close();
             log.info("PDF created at: " + dest);
